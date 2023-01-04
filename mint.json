@@ -25,7 +25,7 @@
   },
   "topbarLinks": [
     {
-      "name": "Radiant Segment",
+      "name": "Segment",
       "url": "https://segment.radiant.so/"
     }
   ],
@@ -51,13 +51,8 @@
   ],
   "navigation": [
     {
-      "group": "Welcome",
-      "pages": ["introduction","signup","faq/faq"]
-    },
-    {
       "group": "Segments API",
       "pages": [
-        "api-reference/segments/auth",
         "api-reference/segments/execute-query",
         "api-reference/segments/get-segment-by-id",
         "api-reference/segments/create-shared-segment",
@@ -67,13 +62,23 @@
       ]
     },
     {
-      "group": "Search API",
+      "group": "Search",
       "pages": ["api-reference/search/search-for-nft"]
-    }
-    ,
+    },
     {
-      "group": "SDK",
-      "pages": ["sdk/coming-soon"]
+      "group": "Tokens",
+      "pages": ["api-reference/tokens/get-popular-tokens"]
+    },
+    {
+      "group": "NFTs",
+      "pages": ["api-reference/nfts/get-popular-nfts"]
+    },
+    {
+      "group": "Signup",
+      "pages": [
+        "api-reference/signup/chain-alerts",
+        "api-reference/signup/newsletter"
+      ]
     }
   ],
   "footerSocials": {
