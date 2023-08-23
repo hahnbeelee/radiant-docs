@@ -1,0 +1,3690 @@
+{
+  "openapi": "3.0.2",
+  "info": {
+    "title": "Pulze.ai API",
+    "version": "0.1.0"
+  },
+  "paths": {
+    "/": {
+      "get": {
+        "summary": "Root",
+        "description": "The root endpoint is enabled to guide users in one of two cases:\n- Accessing via API -> Return a friendly message indicating that they must access the Docs page.\n- Accessing via browser -> Redirect to Docs page.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/healthz": {
+      "get": {
+        "summary": "Health Check",
+        "description": "An endpoint that checks and ensures the required services are up and running:\n- Redis Knowledge Graph\n- Database\n@return Returns elapsed times for each service",
+        "operationId": "health_check_healthz_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/": {
+      "get": {
+        "summary": "Root",
+        "operationId": "root_v1__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/post-registration": {
+      "post": {
+        "tags": ["auth"],
+        "summary": "Post Registration Create User And Org",
+        "description": "Perform actions after a user registers for the first time through Auth0.\n\nFor email+password registration, this is a \"Post-Registration\" flow.\nFor external services (google, github...) and Logins, it's a \"Post-Login\" flow and gets called every time.",
+        "operationId": "post_registration_create_user_and_org_v1_auth_post_registration_post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Auth0Rization",
+              "type": "string"
+            },
+            "name": "auth0rization",
+            "in": "header"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Auth0PostRegistrationRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Post Registration Create User And Org V1 Auth Post Registration Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/update-user": {
+      "get": {
+        "tags": ["auth"],
+        "summary": "Update User",
+        "description": "Contrary to the endpoint /v1/post-registration, where we send a user, when we call this endpoint we will\nfetch Auth0 to retrieve an updated version of the user, and update it in our database.\n\nThis has the advantage that we only need to know the user's email, as oposed to having Auth0 sending the full object.",
+        "operationId": "update_user_v1_auth_update_user_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            },
+            "name": "email",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Success",
+              "enum": ["true", "false"],
+              "type": "string"
+            },
+            "name": "success",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Message",
+              "type": "string"
+            },
+            "name": "message",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/billing/payments": {
+      "get": {
+        "tags": ["billing"],
+        "summary": "Get Paymentmethod Ids",
+        "description": "Gets all the billing information CONFIGURATION needed to perform billing operations in the frontend.\nThese include: Stripe Pub Key, Organization's Stripe ID, Payment methods, and Intent Secret (stripe).",
+        "operationId": "get_paymentmethod_ids_v1_billing_payments_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingPaymentInfo"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["billing"],
+        "summary": "Add Payment Id",
+        "description": "Retrieves a payment_id and attaches it (i.e. it will be added) to the current organization's\nStripe account. This effectively saves the payment method so it can be used in the future.",
+        "operationId": "add_payment_id_v1_billing_payments_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingAddPayment"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Add Payment Id V1 Billing Payments Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/billing/top-up": {
+      "post": {
+        "tags": ["billing"],
+        "summary": "Top Up Payment",
+        "description": "Adds money to the customer's balance and creates a BalanceTransaction item (i.e. History)",
+        "operationId": "top_up_payment_v1_billing_top_up_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BillingTopUp"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Top Up Payment V1 Billing Top Up Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/billing/list-transactions": {
+      "get": {
+        "tags": ["billing"],
+        "summary": "List Customer Transactions",
+        "description": "Lists the customer's last 30 transactions (Payouts and Charges)",
+        "operationId": "list_customer_transactions_v1_billing_list_transactions_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response List Customer Transactions V1 Billing List Transactions Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/billing/{app_id}": {
+      "get": {
+        "tags": ["billing"],
+        "summary": "Read Billing By App Id",
+        "description": "Get billing info by billing-id.",
+        "operationId": "read_billing_by_app_id_v1_billing__app_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "From Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "from_date",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "To Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "to_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/App_Billing"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/billing/{app_id}/minute": {
+      "get": {
+        "tags": ["billing"],
+        "summary": "Read Billing By App Id Daily",
+        "description": "Get billing info by billing-id -- Minute-by-minute usage.",
+        "operationId": "read_billing_by_app_id_daily_v1_billing__app_id__minute_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "From Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "from_date",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "To Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "to_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Read Billing By App Id Daily V1 Billing  App Id  Minute Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/App_Billing_Interval"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/billing/{app_id}/daily": {
+      "get": {
+        "tags": ["billing"],
+        "summary": "Read Billing By App Id Daily",
+        "description": "Get billing info by billing-id -- Daily usage.",
+        "operationId": "read_billing_by_app_id_daily_v1_billing__app_id__daily_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "From Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "from_date",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "To Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "to_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Read Billing By App Id Daily V1 Billing  App Id  Daily Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/App_Billing_Interval"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/billing/{app_id}/monthly": {
+      "get": {
+        "tags": ["billing"],
+        "summary": "Read Billing By App Id Daily",
+        "description": "Get billing info by billing-id -- Monthly usage.",
+        "operationId": "read_billing_by_app_id_daily_v1_billing__app_id__monthly_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "From Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "from_date",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "To Date",
+              "pattern": "\\d{4}-\\d{2}-\\d{2}",
+              "type": "string",
+              "format": "date"
+            },
+            "name": "to_date",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Read Billing By App Id Daily V1 Billing  App Id  Monthly Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/App_Billing_Interval"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/apps/": {
+      "post": {
+        "tags": ["apps"],
+        "summary": "Get Apps List",
+        "description": "Retrieve the list of Apps for the user's Org.",
+        "operationId": "get_apps_list_v1_apps__post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Page",
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Size",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GetTableParams"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/apps/{app_id}": {
+      "get": {
+        "tags": ["apps"],
+        "summary": "Get App By Id",
+        "description": "Retrieve an App by ID.",
+        "operationId": "get_app_by_id_v1_apps__app_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppWithModelUpdatesInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": ["apps"],
+        "summary": "Delete App",
+        "description": "Delete existing App.",
+        "operationId": "delete_app_v1_apps__app_id__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppDeleteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/apps/create": {
+      "post": {
+        "tags": ["apps"],
+        "summary": "Create App",
+        "description": "Create new App.",
+        "operationId": "create_app_v1_apps_create_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppCreateData"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/apps/update": {
+      "put": {
+        "tags": ["apps"],
+        "summary": "Update App And Models",
+        "description": "Update an App (description, active/inactive models, weights, ...).",
+        "operationId": "update_app_and_models_v1_apps_update_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AppUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppWithModelUpdatesInfo"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/logs/": {
+      "post": {
+        "tags": ["logs"],
+        "summary": "Get Logs For App",
+        "description": "Get the list of logs that match the specified filters. When accessing via an App's API Key, only logs for that\napp will be returned.",
+        "operationId": "get_logs_for_app_v1_logs__post",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Page",
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 1
+            },
+            "name": "page",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Size",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "type": "integer",
+              "default": 50
+            },
+            "name": "size",
+            "in": "query"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FilterLogsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/logs/{log_id}": {
+      "get": {
+        "tags": ["logs"],
+        "summary": "Rate Log By Id",
+        "description": "Get a specific log by id. If accessing via API Key, this endpoint will only return a log if it belongs to that App.\nIf the log's App is disabled, this endpoint won't return it.",
+        "operationId": "rate_log_by_id_v1_logs__log_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Log Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "log_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Request_Normalized"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/logs/{log_id}/rating": {
+      "post": {
+        "tags": ["logs"],
+        "summary": "Rate Log By Id",
+        "description": "Rate a specific request by its ID. When accessing it via an App's API Key, this endpoint will only allow\nrating a log of that specific app.",
+        "operationId": "rate_log_by_id_v1_logs__log_id__rating_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Log Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "log_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogResponseRatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Request_Normalized"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/logs/{log_id}/rating/playground": {
+      "post": {
+        "tags": ["logs"],
+        "summary": "Rate Log By Id",
+        "operationId": "rate_log_by_id_v1_logs__log_id__rating_playground_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Log Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "log_id",
+            "in": "path"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogResponseRatingRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Request_Normalized"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/general/dashboard-stats": {
+      "post": {
+        "tags": ["general"],
+        "summary": "Get Dashboard Requests",
+        "description": "Fetch the data for the different graphs in the dashboard.",
+        "operationId": "get_dashboard_requests_v1_general_dashboard_stats_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StatsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Dashboard Requests V1 General Dashboard Stats Post",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/DashboardGraphData"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/general/settings": {
+      "get": {
+        "tags": ["general"],
+        "summary": "Get Settings",
+        "description": "Get general settings for the app: Settings + List of Orgs.",
+        "operationId": "get_settings_v1_general_settings_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FrontendSettingsResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/general/accept-terms": {
+      "post": {
+        "tags": ["general"],
+        "summary": "Accept Terms",
+        "description": "Confirm that the user has accepted the Terms of Service.\nWhen calling this endpoint, the terms/privacy will be updated to the current date. This is useful to know\nwhich users to re-prompt when an update to the ToS comes out.\n@note - Because the UI also accesses /v1/settings, it's aware of whether there are new ToS or not and automatically\ndisplays a popup if needed.",
+        "operationId": "accept_terms_v1_general_accept_terms_post",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Tab",
+              "enum": ["privacy", "terms"],
+              "type": "string"
+            },
+            "name": "tab",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Accept Terms V1 General Accept Terms Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/general/is-valid-email": {
+      "get": {
+        "tags": ["general"],
+        "summary": "Get Is Temporary Email",
+        "description": "Checks if an email comes from a trusted domain or not. See function `is_temporary_email` for more details",
+        "operationId": "get_is_temporary_email_v1_general_is_valid_email_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Email",
+              "type": "string"
+            },
+            "name": "email",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/general/preview-email": {
+      "get": {
+        "tags": ["general"],
+        "summary": "Preview Template",
+        "description": "Preview emails directly in the browser - without sending them. Useful for development.\n\n@var pw: a GET parameter with the password. See \"KEY_TO_PREVIEW_EMAILS\"\n@var email_type: The type of email. See \"EMAIL_TYPES\".",
+        "operationId": "preview_template_v1_general_preview_email_get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Pw",
+              "type": "string"
+            },
+            "name": "pw",
+            "in": "query"
+          },
+          {
+            "required": true,
+            "schema": {
+              "title": "Email Type",
+              "enum": ["invite_email", "welcome_email"],
+              "type": "string"
+            },
+            "name": "email_type",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/general/playground/{shared_id}": {
+      "get": {
+        "tags": ["general"],
+        "summary": "Get Shared Playground Conversation",
+        "description": "For a given {shared_id}, retrieve the chats in the correct format and chronological order.",
+        "operationId": "get_shared_playground_conversation_v1_general_playground__shared_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Shared Id",
+              "type": "string"
+            },
+            "name": "shared_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/org/list": {
+      "get": {
+        "tags": ["org"],
+        "summary": "Get Org List",
+        "description": "Retrieve a list of the organizations the logged-in user belongs to.\n\nNote: This function does _not_ check for permissions\n\nExplanation:\n    After user_org_access check we can assume that the user has permissions to proceed.\n\n    Because the user belongs to at least one organization, we can display them\n    such list. The list of orgs will be shown regardless of privilege, hence why\n    we _can not_ check for permissions anymore. Moreover, the list is always the same, whereas\n    different orgs have different privileges (so checking for privileges in the current org is asymmetric)",
+        "operationId": "get_org_list_v1_org_list_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Org List V1 Org List Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/UserOrgAccess"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/switch/{org_id}": {
+      "patch": {
+        "tags": ["org"],
+        "summary": "Switch To Org",
+        "description": "Switch the user to a different organisation.",
+        "operationId": "switch_to_org_v1_org_switch__org_id__patch",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Org Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "org_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserOrgAccess"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/": {
+      "get": {
+        "tags": ["org"],
+        "summary": "Get Org",
+        "description": "Get current user's Organization -- unless it's a personal org.",
+        "operationId": "get_org_v1_org__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Org"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "put": {
+        "tags": ["org"],
+        "summary": "Get Org",
+        "description": "Update current user's Organization -- unless it's a personal org.",
+        "operationId": "get_org_v1_org__put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgUpdate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Org"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "post": {
+        "tags": ["org"],
+        "summary": "Create Org",
+        "description": "Create new organization.",
+        "operationId": "create_org_v1_org__post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrgCreateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OrgCreateResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/{id}": {
+      "delete": {
+        "tags": ["org"],
+        "summary": "Delete Org",
+        "description": "Delete existing Organization.",
+        "operationId": "delete_org_v1_org__id__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AppDeleteResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/admins": {
+      "get": {
+        "tags": ["org"],
+        "summary": "Get Admin Org List",
+        "description": "Get a list of the admins for an organization.",
+        "operationId": "get_admin_org_list_v1_org_admins_get",
+        "parameters": [
+          {
+            "required": false,
+            "schema": {
+              "title": "Skip",
+              "type": "integer",
+              "default": 0
+            },
+            "name": "skip",
+            "in": "query"
+          },
+          {
+            "required": false,
+            "schema": {
+              "title": "Limit",
+              "type": "integer",
+              "default": 100
+            },
+            "name": "limit",
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Admin Org List V1 Org Admins Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgMember"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/invite/resend-email": {
+      "put": {
+        "tags": ["org"],
+        "summary": "Resend Invitation Email",
+        "description": "Resends an invitation email",
+        "operationId": "resend_invitation_email_v1_org_invite_resend_email_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResendInviteEmail"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Resend Invitation Email V1 Org Invite Resend Email Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/invite": {
+      "post": {
+        "tags": ["org"],
+        "summary": "Invite User To Org",
+        "description": "Invite users to a new organization.",
+        "operationId": "invite_user_to_org_v1_org_invite_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/InviteFormRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Invite User To Org V1 Org Invite Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/users": {
+      "put": {
+        "tags": ["org"],
+        "summary": "Update User Permissions",
+        "description": "Update permissions for an existing Organization Member",
+        "operationId": "update_user_permissions_v1_org_users_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePermissionsRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Update User Permissions V1 Org Users Put"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/users/{auth0_id_or_token}": {
+      "delete": {
+        "tags": ["org"],
+        "summary": "Delete User From Org",
+        "description": "Delete existing Member from a given Organization.",
+        "operationId": "delete_user_from_org_v1_org_users__auth0_id_or_token__delete",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "Auth0 Id Or Token",
+              "type": "string"
+            },
+            "name": "auth0_id_or_token",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Delete User From Org V1 Org Users  Auth0 Id Or Token  Delete"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/members": {
+      "post": {
+        "tags": ["org"],
+        "summary": "Org Member List",
+        "description": "List the users who have been invited to a team organization.",
+        "operationId": "org_member_list_v1_org_members_post",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Org Member List V1 Org Members Post",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/OrgMemberInvite"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/org/join-with-invite": {
+      "post": {
+        "tags": ["org"],
+        "summary": "Join Org With Invite",
+        "description": "Accept (or reject) an invitation to join a team.",
+        "operationId": "join_org_with_invite_v1_org_join_with_invite_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptInviteRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Join Org With Invite V1 Org Join With Invite Post"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/models/": {
+      "get": {
+        "tags": ["models"],
+        "summary": "Get Models For App From Hash",
+        "description": "Get a list of the Models which are active on Redis -- for a specific App (by Hash).",
+        "operationId": "get_models_for_app_from_hash_v1_models__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Models For App From Hash V1 Models  Get",
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/models/all": {
+      "get": {
+        "tags": ["models"],
+        "summary": "Get Api All Available Models",
+        "description": "Get a list of all the available Models in the platform.",
+        "operationId": "get_api_all_available_models_v1_models_all_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Api All Available Models V1 Models All Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PulzeEngineModelAndProvider"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/models/{app_id}": {
+      "get": {
+        "tags": ["models"],
+        "summary": "Get Models For App From Id",
+        "description": "Get a list of the Models which are active on Redis -- for a specific App (by ID).",
+        "operationId": "get_models_for_app_from_id_v1_models__app_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "title": "App Id",
+              "type": "string",
+              "format": "uuid"
+            },
+            "name": "app_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "title": "Response Get Models For App From Id V1 Models  App Id  Get",
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PulzeEngineModelAndProvider"
+                  }
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/models/rank": {
+      "post": {
+        "tags": ["models"],
+        "summary": "Get Ranked Models By Score",
+        "description": "Given a combination of Weights, Temperature and Prompt/Messages, plus an optional APP (defaults to Playground!),\nwe fetch and retrieve a list of the models with the highest score for the current settings.",
+        "operationId": "get_ranked_models_by_score_v1_models_rank_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaygroundCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PulzeEngineModelRanking"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/chat/completions": {
+      "post": {
+        "tags": ["chat"],
+        "summary": "Chat Completions",
+        "description": "Perform a Chat Completion request.",
+        "operationId": "chat_completions_v1_chat_completions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompletionRequestPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    },
+    "/v1/chat/playground": {
+      "post": {
+        "tags": ["chat"],
+        "summary": "Get Playground Prompt Request",
+        "description": "In a similar way to our /v1/chat_completions endpoint, this endpoint is used (unauthenticated)\nto store Playground requests in the database.\nThe endpoint returns the created log, and Frontend handles the data.",
+        "operationId": "get_playground_prompt_request_v1_chat_playground_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PlaygroundCompletionRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Request_Normalized"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/completions": {
+      "post": {
+        "tags": ["completions"],
+        "summary": "Protected Completions",
+        "description": "Perform a text Completion request.",
+        "operationId": "protected_completions_v1_completions_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CompletionRequestPayload"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AcceptInviteRequest": {
+        "title": "AcceptInviteRequest",
+        "required": ["email", "token"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "accept": {
+            "title": "Accept",
+            "type": "string",
+            "default": "1"
+          }
+        }
+      },
+      "App": {
+        "title": "App",
+        "required": [
+          "hashed_key",
+          "key_end",
+          "description",
+          "is_active",
+          "auth0_id",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "hashed_key": {
+            "title": "Hashed Key",
+            "type": "string"
+          },
+          "key_end": {
+            "title": "Key End",
+            "type": "string"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "auth0_id": {
+            "title": "Auth0 Id",
+            "type": "string"
+          },
+          "org_id": {
+            "title": "Org Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "app_settings": {
+            "$ref": "#/components/schemas/LLMModelWeights"
+          },
+          "added_on": {
+            "title": "Added On",
+            "type": "string",
+            "format": "date-time"
+          },
+          "modified_on": {
+            "title": "Modified On",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "disabled_models": {
+            "title": "Disabled Models",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "active_models": {
+            "title": "Active Models",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AppCreateData": {
+        "title": "AppCreateData",
+        "type": "object",
+        "properties": {
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "weights": {
+            "$ref": "#/components/schemas/LLMModelWeights"
+          }
+        }
+      },
+      "AppCreateResponse": {
+        "title": "AppCreateResponse",
+        "required": ["app_id"],
+        "type": "object",
+        "properties": {
+          "app_id": {
+            "title": "App Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_key": {
+            "title": "Created Key",
+            "type": "string"
+          },
+          "key_end": {
+            "title": "Key End",
+            "type": "string"
+          }
+        }
+      },
+      "AppDeleteResponse": {
+        "title": "AppDeleteResponse",
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "AppUpdate": {
+        "title": "AppUpdate",
+        "required": ["id"],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "disabled_models": {
+            "title": "Disabled Models",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": []
+          },
+          "app_settings": {
+            "title": "App Settings",
+            "type": "object"
+          }
+        }
+      },
+      "AppWithModelUpdatesInfo": {
+        "title": "AppWithModelUpdatesInfo",
+        "required": ["app", "model_settings"],
+        "type": "object",
+        "properties": {
+          "app": {
+            "$ref": "#/components/schemas/App"
+          },
+          "model_settings": {
+            "title": "Model Settings",
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/PulzeEngineModel"
+            }
+          }
+        }
+      },
+      "App_Billing": {
+        "title": "App_Billing",
+        "required": ["app_id", "auth0_id", "tokens_sum", "costs_sum"],
+        "type": "object",
+        "properties": {
+          "app_id": {
+            "title": "App Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "auth0_id": {
+            "title": "Auth0 Id",
+            "type": "string"
+          },
+          "tokens_sum": {
+            "title": "Tokens Sum",
+            "type": "integer"
+          },
+          "costs_sum": {
+            "title": "Costs Sum",
+            "type": "number"
+          }
+        }
+      },
+      "App_Billing_Interval": {
+        "title": "App_Billing_Interval",
+        "required": ["time", "prompt_cost", "completion_cost", "total_cost"],
+        "type": "object",
+        "properties": {
+          "time": {
+            "title": "Time",
+            "type": "string",
+            "format": "date-time"
+          },
+          "prompt_cost": {
+            "title": "Prompt Cost",
+            "type": "number"
+          },
+          "completion_cost": {
+            "title": "Completion Cost",
+            "type": "number"
+          },
+          "total_cost": {
+            "title": "Total Cost",
+            "type": "number"
+          }
+        }
+      },
+      "Auth0PostRegistrationRequest": {
+        "title": "Auth0PostRegistrationRequest",
+        "required": ["user_id", "email"],
+        "type": "object",
+        "properties": {
+          "user_id": {
+            "title": "User Id",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "picture": {
+            "title": "Picture",
+            "type": "string",
+            "default": ""
+          },
+          "email_verified": {
+            "title": "Email Verified",
+            "type": "boolean",
+            "default": false
+          },
+          "given_name": {
+            "title": "Given Name",
+            "type": "string",
+            "default": ""
+          },
+          "family_name": {
+            "title": "Family Name",
+            "type": "string",
+            "default": ""
+          },
+          "name": {
+            "title": "Name",
+            "type": "string",
+            "default": ""
+          },
+          "phone_number": {
+            "title": "Phone Number",
+            "type": "string",
+            "default": ""
+          },
+          "phone_verified": {
+            "title": "Phone Verified",
+            "type": "boolean",
+            "default": false
+          },
+          "nickname": {
+            "title": "Nickname",
+            "type": "string",
+            "default": ""
+          },
+          "created_at": {
+            "title": "Created At",
+            "type": "string",
+            "default": ""
+          },
+          "extra_info": {
+            "title": "Extra Info",
+            "type": "object",
+            "default": {}
+          }
+        }
+      },
+      "BillingAddPayment": {
+        "title": "BillingAddPayment",
+        "required": ["payment_id"],
+        "type": "object",
+        "properties": {
+          "payment_id": {
+            "title": "Payment Id",
+            "type": "string"
+          }
+        }
+      },
+      "BillingPaymentInfo": {
+        "title": "BillingPaymentInfo",
+        "required": ["public_key", "intent_key", "id", "payments", "balance"],
+        "type": "object",
+        "properties": {
+          "public_key": {
+            "title": "Public Key",
+            "type": "string"
+          },
+          "intent_key": {
+            "title": "Intent Key",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "payments": {
+            "title": "Payments",
+            "type": "array",
+            "items": {}
+          },
+          "balance": {
+            "$ref": "#/components/schemas/PaymentDetailsBalance"
+          }
+        }
+      },
+      "BillingTopUp": {
+        "title": "BillingTopUp",
+        "required": ["amount", "currency", "return_url"],
+        "type": "object",
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "integer"
+          },
+          "currency": {
+            "title": "Currency",
+            "type": "string"
+          },
+          "return_url": {
+            "title": "Return Url",
+            "type": "string"
+          }
+        }
+      },
+      "CompletionRequestPayload": {
+        "title": "CompletionRequestPayload",
+        "type": "object",
+        "properties": {
+          "prompt": {
+            "title": "Prompt",
+            "type": "string",
+            "description": "The prompt text sent (for a /completions request)"
+          },
+          "messages": {
+            "title": "Messages",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleContentChatChoice"
+            },
+            "description": "The conversation sent (with or without history) (for a /chat/completions request)",
+            "default": []
+          },
+          "model": {
+            "title": "Model",
+            "type": "string",
+            "description": "\nOptionally specify the model you'd like Pulze to use.\n@optional\n@default \"\" (best-model)\n",
+            "default": ""
+          },
+          "suffix": {
+            "title": "Suffix",
+            "type": "string",
+            "default": ""
+          },
+          "max_tokens": {
+            "title": "Max Tokens",
+            "type": "integer",
+            "description": "The maximum number of tokens that the response can contain.",
+            "default": 16
+          },
+          "weights": {
+            "title": "Weights",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LLMModelWeights"
+              }
+            ],
+            "description": "Optionally specify specific weights for this request only. Leave empty to use the App's weights (global configuration)"
+          },
+          "temperature": {
+            "title": "Temperature",
+            "type": "number",
+            "description": "Optionally specify the temperature for this request only. Leave empty to allow Pulze to guess it for you.",
+            "default": 1
+          },
+          "top_p": {
+            "title": "Top P",
+            "type": "number",
+            "default": 1
+          },
+          "n": {
+            "title": "N",
+            "type": "integer",
+            "description": "\nThe number of responses the AI should return.\n@default 1\n",
+            "default": 1
+          },
+          "stream": {
+            "title": "Stream",
+            "type": "boolean",
+            "description": "\n** NOT YET AVAILABLE **\nSpecify if you want the response to be streamed or to be returned as a standard HTTP request\n",
+            "default": false
+          },
+          "logprobs": {
+            "title": "Logprobs",
+            "type": "integer"
+          },
+          "echo": {
+            "title": "Echo",
+            "type": "boolean",
+            "default": false
+          },
+          "stop": {
+            "title": "Stop",
+            "type": "string",
+            "description": "Stop responding when this sequence of characters is generated. Leave empty to allow the model to decide.",
+            "default": ""
+          },
+          "presence_penalty": {
+            "title": "Presence Penalty",
+            "type": "number",
+            "default": 0
+          },
+          "frequency_penalty": {
+            "title": "Frequency Penalty",
+            "type": "number",
+            "default": 0
+          },
+          "best_of": {
+            "title": "Best Of",
+            "type": "integer",
+            "default": 1
+          },
+          "logit_bias": {
+            "title": "Logit Bias",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "integer"
+              }
+            ]
+          },
+          "user": {
+            "title": "User",
+            "type": "string",
+            "default": ""
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string",
+            "default": ""
+          },
+          "headers": {
+            "title": "Headers",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Headers sent alongside the request",
+            "default": {}
+          },
+          "labels": {
+            "title": "Labels",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The labels sent alongside the request as a JSON-encoded Dict[str, str] inside of the header \"custom-labels\".",
+            "default": {}
+          }
+        }
+      },
+      "DashboardGraphData": {
+        "title": "DashboardGraphData",
+        "required": [
+          "name",
+          "label",
+          "id",
+          "color",
+          "data",
+          "max",
+          "total",
+          "interval"
+        ],
+        "type": "object",
+        "properties": {
+          "large": {
+            "title": "Large",
+            "type": "boolean",
+            "default": false
+          },
+          "cumulative": {
+            "title": "Cumulative",
+            "type": "boolean"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "color": {
+            "title": "Color",
+            "type": "string"
+          },
+          "data": {
+            "title": "Data",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StatsPopulatedGraphResult"
+            }
+          },
+          "max": {
+            "title": "Max",
+            "type": "number"
+          },
+          "total": {
+            "title": "Total",
+            "type": "number"
+          },
+          "interval": {
+            "title": "Interval",
+            "type": "string"
+          }
+        }
+      },
+      "FilterLogsRequest": {
+        "title": "FilterLogsRequest",
+        "type": "object",
+        "properties": {
+          "date_from": {
+            "title": "Date From",
+            "type": "string",
+            "description": "The earliest date we search for. Defaults to `datetime.now() - 1day`",
+            "format": "date-time",
+            "default": "2023-08-22T16:17:15.005474"
+          },
+          "date_to": {
+            "title": "Date To",
+            "type": "string",
+            "description": "The latest date we search for. Defaults to `datetime.now()`",
+            "format": "date-time",
+            "default": "2023-08-23T16:17:15.005482"
+          },
+          "keys": {
+            "title": "Keys",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of API Keys we want to filter for. Leave the list empty to disable filtering and return data for all apps instead.",
+            "default": []
+          },
+          "labels": {
+            "title": "Labels",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Only logs (requests) with all of the specified labels will be returned. Values get compared between their lowercase forms.",
+            "default": {}
+          },
+          "query": {
+            "title": "Query",
+            "type": "string",
+            "description": "Search for logs containing the `query` in their Request or Response.",
+            "default": ""
+          }
+        }
+      },
+      "FrontendSettings": {
+        "title": "FrontendSettings",
+        "required": ["currency"],
+        "type": "object",
+        "properties": {
+          "terms_accepted": {
+            "title": "Terms Accepted",
+            "type": "string",
+            "format": "date-time"
+          },
+          "privacy_accepted": {
+            "title": "Privacy Accepted",
+            "type": "string",
+            "format": "date-time"
+          },
+          "currency": {
+            "title": "Currency",
+            "enum": ["USD"],
+            "type": "string"
+          }
+        }
+      },
+      "FrontendSettingsResponse": {
+        "title": "FrontendSettingsResponse",
+        "required": ["orgs", "settings"],
+        "type": "object",
+        "properties": {
+          "orgs": {
+            "title": "Orgs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserOrgAccess"
+            }
+          },
+          "settings": {
+            "$ref": "#/components/schemas/FrontendSettings"
+          }
+        }
+      },
+      "GetTableParams": {
+        "title": "GetTableParams",
+        "required": ["params"],
+        "type": "object",
+        "properties": {
+          "params": {
+            "title": "Params",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GetTableSortParams"
+            }
+          }
+        }
+      },
+      "GetTableSortParams": {
+        "title": "GetTableSortParams",
+        "required": ["col", "order"],
+        "type": "object",
+        "properties": {
+          "col": {
+            "title": "Col",
+            "type": "string"
+          },
+          "order": {
+            "title": "Order",
+            "enum": ["asc", "desc"],
+            "type": "string"
+          },
+          "multiple": {
+            "title": "Multiple",
+            "type": "boolean"
+          }
+        }
+      },
+      "HTTPValidationError": {
+        "title": "HTTPValidationError",
+        "type": "object",
+        "properties": {
+          "detail": {
+            "title": "Detail",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            }
+          }
+        }
+      },
+      "InviteFormEmail": {
+        "title": "InviteFormEmail",
+        "required": ["email", "role"],
+        "type": "object",
+        "properties": {
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "role": {
+            "title": "Role",
+            "type": "string"
+          }
+        }
+      },
+      "InviteFormRequest": {
+        "title": "InviteFormRequest",
+        "required": ["invite_link", "emails"],
+        "type": "object",
+        "properties": {
+          "invite_link": {
+            "title": "Invite Link",
+            "type": "string"
+          },
+          "emails": {
+            "title": "Emails",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InviteFormEmail"
+            }
+          }
+        }
+      },
+      "LLMModelWeights": {
+        "title": "LLMModelWeights",
+        "type": "object",
+        "properties": {
+          "cost": {
+            "title": "Cost",
+            "type": "number",
+            "description": "Prioritizes cost when selecting the most optimized models for your use case.",
+            "default": 0.4
+          },
+          "latency": {
+            "title": "Latency",
+            "type": "number",
+            "description": "Prioritizes latency and reduces the time delay between submitting a request and receiving the response.",
+            "default": 0.4
+          },
+          "quality": {
+            "title": "Quality",
+            "type": "number",
+            "description": "Prioritizes the quality and readability of the generated responses.",
+            "default": 0.4
+          }
+        }
+      },
+      "LogResponseRatingRequest": {
+        "title": "LogResponseRatingRequest",
+        "type": "object",
+        "properties": {
+          "good_answer": {
+            "title": "Good Answer",
+            "type": "boolean",
+            "description": "The rating given to this request. It can be good (`True`), bad (`False`) or none (`None` == `null`)"
+          },
+          "feedback": {
+            "title": "Feedback",
+            "type": "string",
+            "description": "An optional text with accompanies the feedback's rating",
+            "default": ""
+          }
+        }
+      },
+      "Org": {
+        "title": "Org",
+        "required": ["org_name", "org_creator", "id"],
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "org_display_name": {
+            "title": "Org Display Name",
+            "type": "string"
+          },
+          "org_logo": {
+            "title": "Org Logo",
+            "type": "string"
+          },
+          "org_stripe_id": {
+            "title": "Org Stripe Id",
+            "type": "string"
+          },
+          "org_creator": {
+            "title": "Org Creator",
+            "type": "string"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean",
+            "default": true
+          },
+          "is_personal": {
+            "title": "Is Personal",
+            "type": "boolean",
+            "default": false
+          },
+          "address_1": {
+            "title": "Address 1",
+            "type": "string",
+            "default": ""
+          },
+          "address_2": {
+            "title": "Address 2",
+            "type": "string",
+            "default": ""
+          },
+          "address_city": {
+            "title": "Address City",
+            "type": "string",
+            "default": ""
+          },
+          "address_zip": {
+            "title": "Address Zip",
+            "type": "string",
+            "default": ""
+          },
+          "address_state": {
+            "title": "Address State",
+            "type": "string",
+            "default": ""
+          },
+          "address_country": {
+            "title": "Address Country",
+            "type": "string",
+            "default": ""
+          },
+          "billing_email": {
+            "title": "Billing Email",
+            "type": "string",
+            "default": ""
+          },
+          "credit_balance": {
+            "title": "Credit Balance",
+            "type": "number",
+            "default": 0
+          },
+          "spending_limit_soft": {
+            "title": "Spending Limit Soft",
+            "type": "number",
+            "default": 0
+          },
+          "spending_limit_hard": {
+            "title": "Spending Limit Hard",
+            "type": "number",
+            "default": 0
+          },
+          "added_on": {
+            "title": "Added On",
+            "type": "string",
+            "format": "date-time",
+            "default": "2023-08-23T16:17:15.014423"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "OrgCreateRequest": {
+        "title": "OrgCreateRequest",
+        "required": ["org_name"],
+        "type": "object",
+        "properties": {
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "org_display_name": {
+            "title": "Org Display Name",
+            "type": "string"
+          }
+        }
+      },
+      "OrgCreateResponse": {
+        "title": "OrgCreateResponse",
+        "required": ["org_id", "org_name"],
+        "type": "object",
+        "properties": {
+          "org_id": {
+            "title": "Org Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "org_display_name": {
+            "title": "Org Display Name",
+            "type": "string"
+          }
+        }
+      },
+      "OrgMember": {
+        "title": "OrgMember",
+        "required": [
+          "auth0_id",
+          "org_id",
+          "is_active",
+          "permissions",
+          "last_login",
+          "added_on",
+          "id"
+        ],
+        "type": "object",
+        "properties": {
+          "auth0_id": {
+            "title": "Auth0 Id",
+            "type": "string"
+          },
+          "org_id": {
+            "title": "Org Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "is_active": {
+            "title": "Is Active",
+            "type": "boolean"
+          },
+          "permissions": {
+            "title": "Permissions",
+            "type": "string"
+          },
+          "last_login": {
+            "title": "Last Login",
+            "type": "string",
+            "format": "date-time"
+          },
+          "added_on": {
+            "title": "Added On",
+            "type": "string",
+            "format": "date-time"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "OrgMemberInvite": {
+        "title": "OrgMemberInvite",
+        "required": [
+          "name",
+          "email",
+          "invite_status",
+          "is_current_user",
+          "added_on",
+          "permissions"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "token": {
+            "title": "Token",
+            "type": "string"
+          },
+          "invite_status": {
+            "title": "Invite Status",
+            "type": "string"
+          },
+          "is_current_user": {
+            "title": "Is Current User",
+            "type": "boolean"
+          },
+          "added_on": {
+            "title": "Added On",
+            "type": "string",
+            "format": "date-time"
+          },
+          "last_login": {
+            "title": "Last Login",
+            "type": "string",
+            "format": "date-time"
+          },
+          "permissions": {
+            "title": "Permissions",
+            "type": "string"
+          },
+          "auth0_id": {
+            "title": "Auth0 Id",
+            "type": "string"
+          },
+          "picture": {
+            "title": "Picture",
+            "type": "string"
+          }
+        }
+      },
+      "OrgUpdate": {
+        "title": "OrgUpdate",
+        "required": [
+          "id",
+          "address_1",
+          "address_2",
+          "address_city",
+          "address_zip",
+          "address_state",
+          "address_country",
+          "billing_email",
+          "org_display_name",
+          "org_logo",
+          "org_name"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "address_1": {
+            "title": "Address 1",
+            "type": "string"
+          },
+          "address_2": {
+            "title": "Address 2",
+            "type": "string"
+          },
+          "address_city": {
+            "title": "Address City",
+            "type": "string"
+          },
+          "address_zip": {
+            "title": "Address Zip",
+            "type": "string"
+          },
+          "address_state": {
+            "title": "Address State",
+            "type": "string"
+          },
+          "address_country": {
+            "title": "Address Country",
+            "type": "string"
+          },
+          "billing_email": {
+            "title": "Billing Email",
+            "type": "string"
+          },
+          "org_display_name": {
+            "title": "Org Display Name",
+            "type": "string"
+          },
+          "org_logo": {
+            "title": "Org Logo",
+            "type": "string"
+          },
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "spending_limit_soft": {
+            "title": "Spending Limit Soft",
+            "type": "number"
+          },
+          "spending_limit_hard": {
+            "title": "Spending Limit Hard",
+            "type": "number"
+          },
+          "added_on": {
+            "title": "Added On",
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PaymentDetailsBalance": {
+        "title": "PaymentDetailsBalance",
+        "type": "object",
+        "properties": {
+          "balance": {
+            "title": "Balance",
+            "type": "number",
+            "default": 0
+          },
+          "spending_limit_soft": {
+            "title": "Spending Limit Soft",
+            "type": "number",
+            "default": 0
+          },
+          "spending_limit_hard": {
+            "title": "Spending Limit Hard",
+            "type": "number",
+            "default": 0
+          }
+        }
+      },
+      "PlaygroundCompletionRequest": {
+        "title": "PlaygroundCompletionRequest",
+        "type": "object",
+        "properties": {
+          "messages": {
+            "title": "Messages",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleContentChatChoice"
+            },
+            "description": "The list of messages (user/assistant/user/...) for the prompt",
+            "default": []
+          },
+          "model": {
+            "title": "Model",
+            "type": "string",
+            "description": "An optional model name. If specified, that model will be used"
+          },
+          "temperature": {
+            "title": "Temperature",
+            "type": "number",
+            "description": "The temperature of the request",
+            "default": 0.4
+          },
+          "max_tokens": {
+            "title": "Max Tokens",
+            "type": "integer",
+            "description": "The maximum number of tokens for the request",
+            "default": 140
+          },
+          "weights": {
+            "title": "Weights",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LLMModelWeights"
+              }
+            ],
+            "description": "@required The weights specific to this request"
+          },
+          "max_num_models": {
+            "title": "Max Num Models",
+            "type": "integer",
+            "description": "The maximum number of models for which to perform benchmark requests",
+            "default": 3
+          }
+        }
+      },
+      "PulzeEngineModel": {
+        "title": "PulzeEngineModel",
+        "required": [
+          "url",
+          "until",
+          "description",
+          "provider",
+          "max_tokens",
+          "active"
+        ],
+        "type": "object",
+        "properties": {
+          "url": {
+            "title": "Url",
+            "type": "string"
+          },
+          "until": {
+            "title": "Until",
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "description": {
+            "title": "Description",
+            "type": "string"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "max_tokens": {
+            "title": "Max Tokens",
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "boolean"
+              }
+            ]
+          },
+          "active": {
+            "title": "Active",
+            "type": "boolean"
+          }
+        }
+      },
+      "PulzeEngineModelAndProvider": {
+        "title": "PulzeEngineModelAndProvider",
+        "required": ["provider", "model"],
+        "type": "object",
+        "properties": {
+          "provider": {
+            "title": "Provider",
+            "type": "string"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string"
+          },
+          "score": {
+            "title": "Score",
+            "type": "number"
+          }
+        }
+      },
+      "PulzeEngineModelRanking": {
+        "title": "PulzeEngineModelRanking",
+        "required": ["category"],
+        "type": "object",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string",
+            "description": "\n@deprecated\nThe best-approximation category for the request\n"
+          },
+          "models": {
+            "title": "Models",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PulzeEngineModelAndProvider"
+            },
+            "description": "A list of the best models for the given prompt+config, sorted by overall score descending.",
+            "default": []
+          }
+        }
+      },
+      "Request_Normalized": {
+        "title": "Request_Normalized",
+        "required": [
+          "response",
+          "id",
+          "prompt_tokens",
+          "completion_tokens",
+          "total_tokens",
+          "prompt_tokens_cost",
+          "completion_tokens_cost",
+          "total_tokens_cost"
+        ],
+        "type": "object",
+        "properties": {
+          "request_type": {
+            "title": "Request Type",
+            "enum": ["completions", "chat_completions"],
+            "type": "string",
+            "description": "The type of request (text completion or chat) the user sends and expects back"
+          },
+          "provider": {
+            "title": "Provider",
+            "type": "string",
+            "description": "The provider (i.e. company) which answered the request"
+          },
+          "model": {
+            "title": "Model",
+            "type": "string",
+            "description": "The name of the provider's model which was used to answer the request"
+          },
+          "prompt": {
+            "title": "Prompt",
+            "type": "string",
+            "description": "The prompt in text format"
+          },
+          "response_text": {
+            "title": "Response Text",
+            "type": "string",
+            "description": "The response in text format"
+          },
+          "payload": {
+            "title": "Payload",
+            "type": "object",
+            "description": "The payload sent with the request"
+          },
+          "response": {
+            "title": "Response",
+            "type": "object",
+            "description": "The response object"
+          },
+          "app_id": {
+            "title": "App Id",
+            "type": "string",
+            "description": "The ID of the app that performed the request",
+            "format": "uuid"
+          },
+          "status_code": {
+            "title": "Status Code",
+            "type": "integer",
+            "description": "The status code of the request to the AI model",
+            "default": -1
+          },
+          "id": {
+            "title": "Id",
+            "type": "string",
+            "description": "ID of the request",
+            "format": "uuid"
+          },
+          "good_answer": {
+            "title": "Good Answer",
+            "type": "boolean",
+            "description": "The rating for the request"
+          },
+          "feedback": {
+            "title": "Feedback",
+            "type": "string",
+            "description": "A free text providing more detailed feedback",
+            "default": ""
+          },
+          "prompt_tokens": {
+            "title": "Prompt Tokens",
+            "type": "integer",
+            "description": "Number of tokens the request used"
+          },
+          "completion_tokens": {
+            "title": "Completion Tokens",
+            "type": "integer",
+            "description": "Number of tokens the response used"
+          },
+          "total_tokens": {
+            "title": "Total Tokens",
+            "type": "integer",
+            "description": "Number of tokens of (request + response)"
+          },
+          "prompt_tokens_cost": {
+            "title": "Prompt Tokens Cost",
+            "type": "number",
+            "description": "Cost (in $) of the prompt"
+          },
+          "completion_tokens_cost": {
+            "title": "Completion Tokens Cost",
+            "type": "number",
+            "description": "Cost (in $) of the response"
+          },
+          "total_tokens_cost": {
+            "title": "Total Tokens Cost",
+            "type": "number",
+            "description": "Cost (in $) of the (request + response)"
+          },
+          "created": {
+            "title": "Created",
+            "type": "string",
+            "description": "When the request was performed",
+            "format": "date-time"
+          }
+        }
+      },
+      "ResendInviteEmail": {
+        "title": "ResendInviteEmail",
+        "required": ["invite_link", "email", "org_id"],
+        "type": "object",
+        "properties": {
+          "invite_link": {
+            "title": "Invite Link",
+            "type": "string"
+          },
+          "email": {
+            "title": "Email",
+            "type": "string"
+          },
+          "org_id": {
+            "title": "Org Id",
+            "type": "string"
+          }
+        }
+      },
+      "RoleContentChatChoice": {
+        "title": "RoleContentChatChoice",
+        "required": ["role", "content"],
+        "type": "object",
+        "properties": {
+          "role": {
+            "title": "Role",
+            "enum": ["user", "assistant", "system"],
+            "type": "string"
+          },
+          "content": {
+            "title": "Content",
+            "type": "string"
+          }
+        }
+      },
+      "StatsPopulatedGraphResult": {
+        "title": "StatsPopulatedGraphResult",
+        "required": ["date", "x", "y"],
+        "type": "object",
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "x": {
+            "title": "X",
+            "type": "string"
+          },
+          "y": {
+            "title": "Y",
+            "type": "number"
+          }
+        }
+      },
+      "StatsRequest": {
+        "title": "StatsRequest",
+        "type": "object",
+        "properties": {
+          "date_from": {
+            "title": "Date From",
+            "type": "string",
+            "description": "The earliest date we search for. Defaults to `datetime.now() - 1day`",
+            "format": "date-time",
+            "default": "2023-08-22T16:17:15.005474"
+          },
+          "date_to": {
+            "title": "Date To",
+            "type": "string",
+            "description": "The latest date we search for. Defaults to `datetime.now()`",
+            "format": "date-time",
+            "default": "2023-08-23T16:17:15.005482"
+          },
+          "keys": {
+            "title": "Keys",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "The list of API Keys we want to filter for. Leave the list empty to disable filtering and return data for all apps instead.",
+            "default": []
+          },
+          "cumulative": {
+            "title": "Cumulative",
+            "type": "object",
+            "additionalProperties": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "UpdatePermissionsRequest": {
+        "title": "UpdatePermissionsRequest",
+        "required": ["permissions", "auth0_id"],
+        "type": "object",
+        "properties": {
+          "permissions": {
+            "title": "Permissions",
+            "type": "string"
+          },
+          "auth0_id": {
+            "title": "Auth0 Id",
+            "type": "string"
+          }
+        }
+      },
+      "UserOrgAccess": {
+        "title": "UserOrgAccess",
+        "required": ["auth0_id", "org_id", "org_display_name", "org_name"],
+        "type": "object",
+        "properties": {
+          "auth0_id": {
+            "title": "Auth0 Id",
+            "type": "string"
+          },
+          "org_id": {
+            "title": "Org Id",
+            "type": "string",
+            "format": "uuid"
+          },
+          "org_stripe_id": {
+            "title": "Org Stripe Id",
+            "type": "string"
+          },
+          "org_display_name": {
+            "title": "Org Display Name",
+            "type": "string"
+          },
+          "org_logo": {
+            "title": "Org Logo",
+            "type": "string"
+          },
+          "org_name": {
+            "title": "Org Name",
+            "type": "string"
+          },
+          "full_name": {
+            "title": "Full Name",
+            "type": "string"
+          },
+          "user_avatar": {
+            "title": "User Avatar",
+            "type": "string"
+          },
+          "billing_email": {
+            "title": "Billing Email",
+            "type": "string"
+          },
+          "balance": {
+            "title": "Balance",
+            "type": "number",
+            "default": 0
+          },
+          "org_is_active": {
+            "title": "Org Is Active",
+            "type": "boolean",
+            "default": false
+          },
+          "is_personal_org": {
+            "title": "Is Personal Org",
+            "type": "boolean",
+            "default": true
+          },
+          "permissions": {
+            "title": "Permissions",
+            "type": "string",
+            "default": ""
+          },
+          "member_is_active": {
+            "title": "Member Is Active",
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "ValidationError": {
+        "title": "ValidationError",
+        "required": ["loc", "msg", "type"],
+        "type": "object",
+        "properties": {
+          "loc": {
+            "title": "Location",
+            "type": "array",
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            }
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "type": "http",
+        "scheme": "bearer"
+      }
+    }
+  }
+}
